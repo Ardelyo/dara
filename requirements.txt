@@ -1,0 +1,9 @@
+torch
+transformers
+accelerate
+pillow
+gradio
+einops
+timm
+scipy
+gtts

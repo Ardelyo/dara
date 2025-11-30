@@ -1,0 +1,12 @@
+[
+  {
+    "image": "../images/sample_scene.jpg",
+    "mode": "scene",
+    "text": "A bright living room with a sofa and TV."
+  },
+  {
+    "image": "../images/sample_medicine.jpg",
+    "mode": "medicine",
+    "text": "Paracetamol 500mg"
+  }
+]
