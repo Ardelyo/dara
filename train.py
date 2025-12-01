@@ -54,7 +54,12 @@ def train():
     
     print("Starting training...")
     trainer.train() 
-    print("Training verification complete.")
+    
+    # Save Final Model
+    print("Saving final model...")
+    trainer.save_model("./dara_model_final")
+    processor.save_pretrained("./dara_model_final")
+    print("Training verification complete. Model saved to ./dara_model_final")
 
 if __name__ == "__main__":
     train()

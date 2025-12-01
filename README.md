@@ -6,6 +6,8 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Hugging Face](https://img.shields.io/badge/🤗-Hugging%20Face-yellow.svg)](https://huggingface.co/DARA)
 
+[🇺🇸 English README](README.md) | [🇮🇩 Bahasa Indonesia](README_ID.md)
+
 ## 🎯 Mission
 
 **DARA** is an open-source, lightweight Vision Language Model (VLM) designed for assistive technology. It provides a "second pair of eyes" for visually impaired individuals, elderly users, and the general public.
@@ -33,7 +35,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/dara.git
+git clone https://github.com/ardelyo/dara.git
 cd dara/dara_project
 
 # Install dependencies
@@ -122,8 +124,8 @@ Apache 2.0 License - see [LICENSE](LICENSE) for details.
 
 ## 📞 Contact
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/dara/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/dara/discussions)
+- **Issues**: [GitHub Issues](https://github.com/ardelyo/dara/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/ardelyo/dara/discussions)
 
 ---
 

@@ -6,5 +6,7 @@ gradio
 einops
 timm
 scipy
+deep-translator
+huggingface_hub
 gtts
 peft

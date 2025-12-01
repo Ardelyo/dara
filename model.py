@@ -3,6 +3,7 @@ from transformers import AutoProcessor, AutoModelForCausalLM
 from PIL import Image
 from config import Config
 from gtts import gTTS
+from deep_translator import GoogleTranslator
 import os
 
 class DARA:
@@ -24,7 +25,7 @@ class DARA:
         )
         print("DARA-Lite loaded successfully!")
 
-    def detect(self, image_path, mode=Config.MODE_SCENE):
+    def detect(self, image_path, mode=Config.MODE_SCENE, language="en"):
         """
         Detects and assists based on the selected mode.
         """
@@ -48,7 +49,8 @@ class DARA:
             max_new_tokens=1024,
             early_stopping=False,
             do_sample=False,
-            num_beams=3,
+            num_beams=1,
+            use_cache=False,
         )
         generated_text = self.processor.batch_decode(generated_ids, skip_special_tokens=False)[0]
         print(f"DEBUG: Generated Text: {generated_text}")
@@ -64,18 +66,19 @@ class DARA:
             parsed_answer = {task_prompt: generated_text} # Fallback
 
         # Post-processing / "Smart" Assist Logic
-        final_output = self._process_output(parsed_answer, mode, task_prompt)
+        final_output = self._process_output(parsed_answer, mode, task_prompt, language)
         
         # Generate Audio
-        audio_path = self._generate_audio(final_output)
+        audio_path = self._generate_audio(final_output, language)
         
         return {
             "mode": mode,
             "result": final_output,
-            "audio": audio_path
+            "audio": audio_path,
+            "language": language
         }
 
-    def _process_output(self, parsed_answer, mode, task_prompt):
+    def _process_output(self, parsed_answer, mode, task_prompt, language="en"):
         """
         Refines the raw model output into helpful advice.
         """
@@ -86,7 +89,10 @@ class DARA:
             raw_text = str(raw_text)
 
         if mode == Config.MODE_SCENE:
-            return f"Scene Description: {raw_text}"
+            text = f"Scene Description: {raw_text}"
+            if language == "id":
+                text = GoogleTranslator(source='auto', target='id').translate(text)
+            return text
         
         elif mode == Config.MODE_EMOTION:
             # Enhanced keyword matching
@@ -107,7 +113,10 @@ class DARA:
                 emotion = "Fearful"
                 advice = "Reassure them that they are safe."
                 
-            return f"Emotion: {emotion}. Advice: {advice}. (Context: {raw_text})"
+            text = f"Emotion: {emotion}. Advice: {advice}. (Context: {raw_text})"
+            if language == "id":
+                text = GoogleTranslator(source='auto', target='id').translate(text)
+            return text
 
         elif mode == Config.MODE_MEDICINE:
             # Regex to find dosage (mg/ml) and potential medicine names
@@ -119,7 +128,10 @@ class DARA:
             if dosages:
                 advice = f"Detected dosage: {', '.join(dosages)}. Take as prescribed."
             
-            return f"Label Read: {raw_text}. \n[DARA Assist]: {advice}"
+            text = f"Label Read: {raw_text}. \n[DARA Assist]: {advice}"
+            if language == "id":
+                text = GoogleTranslator(source='auto', target='id').translate(text)
+            return text
 
         elif mode == Config.MODE_CURRENCY:
             # Regex to find currency values
@@ -129,21 +141,28 @@ class DARA:
             values = re.findall(currency_pattern, raw_text, re.IGNORECASE)
             
             if values:
-                return f"Currency Detected: {', '.join(values)}. \n[DARA Assist]: Please verify by touch."
+                text = f"Currency Detected: {', '.join(values)}. \n[DARA Assist]: Please verify by touch."
             else:
-                return f"Currency Description: {raw_text}. \n[DARA Assist]: Specific value not clearly detected."
+                text = f"Currency Description: {raw_text}. \n[DARA Assist]: Specific value not clearly detected."
+            
+            if language == "id":
+                text = GoogleTranslator(source='auto', target='id').translate(text)
+            return text
 
         elif mode == Config.MODE_TEXT:
-            return f"Text Read: {raw_text}"
+            text = f"Text Read: {raw_text}"
+            if language == "id":
+                text = GoogleTranslator(source='auto', target='id').translate(text)
+            return text
 
         return str(raw_text)
 
-    def _generate_audio(self, text):
+    def _generate_audio(self, text, language="en"):
         """
         Generates TTS audio file.
         """
         try:
-            tts = gTTS(text=text, lang='en') # Default to English for now, can switch to 'id'
+            tts = gTTS(text=text, lang=language) 
             save_path = "output.mp3"
             tts.save(save_path)
             return save_path
