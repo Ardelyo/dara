@@ -68,6 +68,17 @@ print(result["result"])  # Smart assist output
 # Audio saved to: result["audio"]
 ```
 
+### ☁️ Using from Hugging Face
+
+Once published, you can use your model directly from the Hub:
+
+```python
+from dara import DARA
+
+# Load your custom model
+dara = DARA(model_id="username/dara-v1")
+```
+
 ## 📊 Model Lineup
 
 | Model | Base | Params | Size | Target Device | Status |

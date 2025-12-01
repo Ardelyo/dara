@@ -7,24 +7,26 @@ from deep_translator import GoogleTranslator
 import os
 
 class DARA:
-    def __init__(self):
-        print(f"Loading DARA-Lite ({Config.MODEL_ID})...")
+    def __init__(self, model_id=None):
+        self.model_id = model_id or Config.MODEL_ID
+        print(f"Loading DARA-Lite ({self.model_id})...")
         self.device = Config.DEVICE
         self.torch_dtype = Config.torch_dtype
         
         # Load Model & Processor
         self.model = AutoModelForCausalLM.from_pretrained(
-            Config.MODEL_ID, 
+            self.model_id, 
             torch_dtype=self.torch_dtype, 
             trust_remote_code=True,
             attn_implementation="eager"
         ).to(self.device)
         self.processor = AutoProcessor.from_pretrained(
-            Config.MODEL_ID, 
+            self.model_id, 
             trust_remote_code=True
         )
         print("DARA-Lite loaded successfully!")
 
+    @torch.inference_mode()
     def detect(self, image_path, mode=Config.MODE_SCENE, language="en"):
         """
         Detects and assists based on the selected mode.
@@ -53,7 +55,7 @@ class DARA:
             use_cache=False,
         )
         generated_text = self.processor.batch_decode(generated_ids, skip_special_tokens=False)[0]
-        print(f"DEBUG: Generated Text: {generated_text}")
+        # print(f"DEBUG: Generated Text: {generated_text}")
         
         try:
             parsed_answer = self.processor.post_process_generation(
@@ -62,7 +64,7 @@ class DARA:
                 image_size=(image.width, image.height)
             )
         except Exception as e:
-            print(f"DEBUG: Post-processing failed: {e}")
+            # print(f"DEBUG: Post-processing failed: {e}")
             parsed_answer = {task_prompt: generated_text} # Fallback
 
         # Post-processing / "Smart" Assist Logic
@@ -89,7 +91,8 @@ class DARA:
             raw_text = str(raw_text)
 
         if mode == Config.MODE_SCENE:
-            text = f"Scene Description: {raw_text}"
+            # Clean up the text
+            text = self._clean_text(raw_text)
             if language == "id":
                 text = GoogleTranslator(source='auto', target='id').translate(text)
             return text
@@ -113,7 +116,7 @@ class DARA:
                 emotion = "Fearful"
                 advice = "Reassure them that they are safe."
                 
-            text = f"Emotion: {emotion}. Advice: {advice}. (Context: {raw_text})"
+            text = f"{emotion}. {advice}"
             if language == "id":
                 text = GoogleTranslator(source='auto', target='id').translate(text)
             return text
@@ -126,9 +129,10 @@ class DARA:
             
             advice = "Consult a doctor for exact dosage."
             if dosages:
-                advice = f"Detected dosage: {', '.join(dosages)}. Take as prescribed."
-            
-            text = f"Label Read: {raw_text}. \n[DARA Assist]: {advice}"
+                text = f"Dosage: {', '.join(dosages)}. Take as prescribed."
+            else:
+                text = self._clean_text(raw_text)
+
             if language == "id":
                 text = GoogleTranslator(source='auto', target='id').translate(text)
             return text
@@ -141,16 +145,16 @@ class DARA:
             values = re.findall(currency_pattern, raw_text, re.IGNORECASE)
             
             if values:
-                text = f"Currency Detected: {', '.join(values)}. \n[DARA Assist]: Please verify by touch."
+                text = f"Currency: {', '.join(values)}."
             else:
-                text = f"Currency Description: {raw_text}. \n[DARA Assist]: Specific value not clearly detected."
+                text = "Currency value unclear."
             
             if language == "id":
                 text = GoogleTranslator(source='auto', target='id').translate(text)
             return text
 
         elif mode == Config.MODE_TEXT:
-            text = f"Text Read: {raw_text}"
+            text = self._clean_text(raw_text)
             if language == "id":
                 text = GoogleTranslator(source='auto', target='id').translate(text)
             return text
@@ -169,6 +173,14 @@ class DARA:
         except Exception as e:
             print(f"TTS Error: {e}")
             return None
+
+    def _clean_text(self, text):
+        """
+        Removes special tokens and extra whitespace.
+        """
+        text = str(text)
+        text = text.replace("</s>", "").replace("<s>", "")
+        return text.strip()
 
 if __name__ == "__main__":
     # Test run

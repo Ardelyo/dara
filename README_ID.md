@@ -69,6 +69,17 @@ print(result["result"])  # Output bantuan cerdas
 # Audio tersimpan di: result["audio"]
 ```
 
+### ☁️ Menggunakan dari Hugging Face
+
+Setelah dipublikasikan, Anda dapat menggunakan model langsung dari Hub:
+
+```python
+from dara import DARA
+
+# Muat model kustom Anda
+dara = DARA(model_id="username/dara-v1")
+```
+
 ## 📊 Jajaran Model
 
 | Model | Basis | Parameter | Ukuran | Perangkat Target | Status |

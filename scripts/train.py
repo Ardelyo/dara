@@ -37,8 +37,8 @@ def train():
         gradient_accumulation_steps=4,
         learning_rate=2e-5,
         logging_steps=1,
-        num_train_epochs=1,
-        max_steps=5, # Short run for verification
+        num_train_epochs=10,
+        # max_steps=5, # Removed for full epoch-based training
         save_steps=100,
         fp16=True if torch.cuda.is_available() else False,
         remove_unused_columns=False

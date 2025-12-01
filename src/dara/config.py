@@ -15,7 +15,7 @@ class Config:
 
     # Prompts mapping
     PROMPTS = {
-        MODE_SCENE: "<OD>", # Object Detection -> will process to description
+        MODE_SCENE: "<MORE_DETAILED_CAPTION>", # Detailed description instead of bounding boxes
         MODE_EMOTION: "<CAPTION>", # Captioning -> will infer emotion
         MODE_MEDICINE: "<OCR>", # OCR -> will parse for medicine info
         MODE_CURRENCY: "<CAPTION>", # Captioning -> will parse for currency info
