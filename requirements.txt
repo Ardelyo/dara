@@ -1,12 +1,9 @@
+gradio
 torch
 transformers
-accelerate
 pillow
-gradio
+gTTS
+deep-translator
 einops
 timm
 scipy
-deep-translator
-huggingface_hub
-gtts
-peft

@@ -27,11 +27,21 @@ class DARA:
         print("DARA-Lite loaded successfully!")
 
     @torch.inference_mode()
-    def detect(self, image_path, mode=Config.MODE_SCENE, language="en"):
+    def detect(self, image_input, mode=Config.MODE_SCENE, language="en"):
         """
         Detects and assists based on the selected mode.
+        Args:
+            image_input (str or PIL.Image.Image): Path to image or PIL Image object.
+            mode (str): Detection mode.
+            language (str): Output language code ('en' or 'id').
         """
-        image = Image.open(image_path)
+        if isinstance(image_input, str):
+            image = Image.open(image_input)
+        elif isinstance(image_input, Image.Image):
+            image = image_input
+        else:
+            raise ValueError("Invalid image input. Must be a path or PIL Image.")
+
         if image.mode != "RGB":
             image = image.convert("RGB")
 
@@ -167,7 +177,9 @@ class DARA:
         """
         try:
             tts = gTTS(text=text, lang=language) 
-            save_path = "output.mp3"
+            # Use a unique filename to avoid collisions in multi-user envs
+            import uuid
+            save_path = f"output_{uuid.uuid4().hex}.mp3"
             tts.save(save_path)
             return save_path
         except Exception as e:
