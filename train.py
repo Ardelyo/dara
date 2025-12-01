@@ -36,8 +36,9 @@ def train():
         per_device_train_batch_size=4,
         gradient_accumulation_steps=4,
         learning_rate=2e-5,
-        logging_steps=10,
-        num_train_epochs=3,
+        logging_steps=1,
+        num_train_epochs=1,
+        max_steps=5, # Short run for verification
         save_steps=100,
         fp16=True if torch.cuda.is_available() else False,
         remove_unused_columns=False
@@ -52,8 +53,8 @@ def train():
     )
     
     print("Starting training...")
-    # trainer.train() # Commented out to prevent accidental run without data
-    print("Training setup complete. Uncomment trainer.train() to start.")
+    trainer.train() 
+    print("Training verification complete.")
 
 if __name__ == "__main__":
     train()

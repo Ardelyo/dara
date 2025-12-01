@@ -30,28 +30,37 @@ class DARADataset(Dataset):
         ground_truth = item["text"]
         
         image = Image.open(image_path).convert("RGB")
-        
-        # Get prompt for the mode
         prompt = Config.PROMPTS.get(mode, "<OD>")
         
-        # Prepare inputs for Florence-2
-        # Note: Florence-2 training format usually involves input_ids and labels
-        inputs = self.processor(
-            text=prompt, 
-            images=image, 
-            return_tensors="pt",
-            padding="max_length",
-            max_length=128
-        )
+        # 1. Process Image
+        # Note: We don't pass text here to avoid the OverflowError in the combined call
+        image_inputs = self.processor(images=image, return_tensors="pt")
+        pixel_values = image_inputs["pixel_values"]
         
-        # Process labels (simplified for demo)
+        # 2. Process Text (Prompt)
+        # We explicitly call the tokenizer
+        text_inputs = self.processor.tokenizer(
+            prompt, 
+            return_tensors="pt", 
+            padding="max_length", 
+            truncation=True, 
+            max_length=64
+        )
+        input_ids = text_inputs["input_ids"]
+        attention_mask = text_inputs["attention_mask"]
+        
+        # 3. Process Labels
         labels = self.processor.tokenizer(
             ground_truth, 
             return_tensors="pt", 
             padding="max_length", 
-            max_length=128
+            truncation=True, 
+            max_length=64
         ).input_ids
         
-        inputs["labels"] = labels
-        
-        return {k: v.squeeze() for k, v in inputs.items()}
+        return {
+            "input_ids": input_ids.squeeze(),
+            "attention_mask": attention_mask.squeeze(),
+            "pixel_values": pixel_values.squeeze(),
+            "labels": labels.squeeze()
+        }

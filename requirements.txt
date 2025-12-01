@@ -7,3 +7,4 @@ einops
 timm
 scipy
 gtts
+peft
