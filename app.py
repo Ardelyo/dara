@@ -1,9 +1,31 @@
 import gradio as gr
 import torch
 from PIL import Image
+import sys
 import os
-from src.dara.model import DARA
-from src.dara.config import Config
+
+# Robust import logic for 'dara' package
+# 1. Try importing directly (if 'dara' is in root or installed)
+# 2. Try adding 'src' to path (standard structure)
+try:
+    from dara.model import DARA
+    from dara.config import Config
+except ImportError:
+    # Try adding src to path
+    src_path = os.path.join(os.path.dirname(__file__), "src")
+    if os.path.exists(src_path):
+        sys.path.insert(0, src_path)
+        try:
+            from dara.model import DARA
+            from dara.config import Config
+        except ImportError as e:
+            raise ImportError(f"Found 'src' directory but failed to import 'dara': {e}")
+    else:
+        # Critical error: src missing
+        raise ImportError(
+            f"CRITICAL: Could not find 'dara' module and 'src' directory is missing at {src_path}. "
+            "Please ensure you have uploaded the entire 'src' folder to the Hugging Face Space."
+        )
 
 # Initialize Model
 print("Initializing DARA Model...")
