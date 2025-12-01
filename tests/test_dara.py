@@ -1,5 +1,5 @@
 import os
-from model import DARA, Config
+from dara import DARA, Config
 
 def main():
     # Initialize Model

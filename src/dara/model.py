@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoProcessor, AutoModelForCausalLM
 from PIL import Image
-from config import Config
+from .config import Config
 from gtts import gTTS
 from deep_translator import GoogleTranslator
 import os

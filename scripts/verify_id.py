@@ -1,4 +1,4 @@
-from model import DARA, Config
+from dara import DARA, Config
 import os
 
 def test_indonesian_support():
@@ -7,7 +7,7 @@ def test_indonesian_support():
     dara = DARA()
     
     # Test image (use one from sampleimages if available, else use a placeholder or skip)
-    image_path = "sampleimages/food table.jpg"
+    image_path = "demo/sampleimages/food table.jpg"
     if not os.path.exists(image_path):
         print(f"⚠️ Warning: {image_path} not found. Skipping inference test.")
         return

@@ -1,5 +1,5 @@
 import gradio as gr
-from model import DARA, Config
+from dara import DARA, Config
 import os
 
 # Initialize Model

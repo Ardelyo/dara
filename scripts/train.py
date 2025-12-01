@@ -1,8 +1,8 @@
 import torch
 from transformers import TrainingArguments, Trainer
 from peft import LoraConfig, get_peft_model
-from model import DARA, Config
-from dataset import DARADataset
+from dara import DARA, Config
+from dara.dataset import DARADataset
 import os
 
 def train():

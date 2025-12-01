@@ -3,7 +3,7 @@ from torch.utils.data import Dataset
 from PIL import Image
 import os
 import json
-from config import Config
+from .config import Config
 
 class DARADataset(Dataset):
     def __init__(self, data_root, processor, split="train"):
