@@ -57,7 +57,14 @@ theme = gr.themes.Soft(
     font=[gr.themes.GoogleFont("Inter"), "ui-sans-serif", "system-ui", "sans-serif"],
 )
 
-with gr.Blocks(theme=theme, title="🪔 DARA - Detect & Assist Recognition AI") as demo:
+with gr.Blocks(title="🪔 DARA - Detect & Assist Recognition AI", analytics_enabled=False) as demo:
+    
+    # Set page title via HTML
+    gr.HTML("""
+    <script>
+        document.title = "🪔 DARA - Detect & Assist Recognition AI";
+    </script>
+    """, visible=False)
     
     # Header
     with gr.Row():
@@ -105,8 +112,7 @@ with gr.Blocks(theme=theme, title="🪔 DARA - Detect & Assist Recognition AI") 
             output_text = gr.Textbox(
                 label="DARA Output", 
                 placeholder="Result will appear here...",
-                lines=4,
-                show_copy_button=True
+                lines=4
             )
             output_audio = gr.Audio(label="Voice Assist", type="filepath", autoplay=True)
 
@@ -143,4 +149,9 @@ with gr.Blocks(theme=theme, title="🪔 DARA - Detect & Assist Recognition AI") 
     )
 
 if __name__ == "__main__":
-    demo.launch(share=False)
+    demo.launch(
+        share=False, 
+        server_name="0.0.0.0", 
+        server_port=7860,
+        theme=theme  # Theme moved to launch() in Gradio 6.x
+    )

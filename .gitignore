@@ -158,6 +158,21 @@ cython_debug/
 # Project specific
 dara_checkpoints/
 dara_model_final/
-output.mp3
-*.jpg
-*.png
+
+# Temp audio files
+output*.mp3
+
+# Temp image files
+temp_*.jpg
+temp_*.png
+
+# Cache directories
+.cache/
+
+# Sample images (user-provided)
+sampleimages/*.jpg
+sampleimages/*.png
+
+# Keep sample images folder structure
+!sampleimages/.gitkeep
+
