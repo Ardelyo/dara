@@ -1,161 +1,315 @@
-# DARA Architecture
+# 🏗️ Arsitektur DARA | DARA Architecture
 
-## System Overview
+[🇮🇩 Bahasa Indonesia](#bahasa-indonesia) | [🇺🇸 English](#english)
 
-DARA is built on a modular, multi-task Vision Language Model architecture that enables 5 distinct assistive modes while maintaining a small footprint.
+---
 
-## Architecture Diagram
+## Bahasa Indonesia
+
+### Gambaran Umum Sistem
+
+DARA dibangun dengan arsitektur Vision Language Model (VLM) modular yang mendukung 5 mode deteksi berbeda sambil mempertahankan ukuran yang ringan dan performa yang cepat.
+
+### Diagram Arsitektur
 
 ```mermaid
 graph TD
-    A[Image Input] --> B[Vision Encoder]
-    B --> C[Florence-2 Base Model]
-    D[Mode Selector] --> E[Task Prompt]
-    E --> C
-    C --> F[Text Decoder]
-    F --> G[Post-Processor]
-    G --> H[Smart Assist Logic]
-    H --> I[Text Output]
-    H --> J[TTS Engine]
-    J --> K[Audio Output]
+    subgraph "Input Layer"
+        A[📷 Input Gambar] --> B[Image Processor]
+        M[🎯 Pemilih Mode] --> N[Task Prompt]
+    end
+    
+    subgraph "Core Engine"
+        B --> C[Vision Encoder<br/>Florence-2 ViT]
+        N --> D[Language Model<br/>Causal LM]
+        C --> D
+    end
+    
+    subgraph "Intelligence Layer"
+        D --> E[Text Decoder]
+        E --> F{Mode Handler}
+        F --> G[SceneMode]
+        F --> H[EmotionMode]
+        F --> I[MedicineMode]
+        F --> J[CurrencyMode]
+        F --> K[TextMode]
+    end
+    
+    subgraph "Output Layer"
+        G & H & I & J & K --> L[ModeResult]
+        L --> O[📝 Teks Output]
+        L --> P[🔊 TTS Audio]
+        L --> Q[📊 Metadata]
+    end
 ```
 
-## Core Components
+### Komponen Utama
 
-### 1. Vision Encoder
-- **Base**: Florence-2 Vision Transformer (ViT)
-- **Input**: 224x224 RGB images
+#### 1. 🖼️ Vision Encoder
+- **Basis**: Florence-2 Vision Transformer (ViT)
+- **Input**: Gambar RGB (otomatis resize)
 - **Output**: Visual embeddings
-- **Features**: Native object detection, OCR capabilities
+- **Fitur**: Deteksi objek, kemampuan OCR bawaan
 
-### 2. Language Model
+#### 2. 🧠 Language Model
+- **Arsitektur**: Causal LM (autoregressive)
+- **Parameter**: 0.23B (model dasar)
+- **Task Prompts**:
+  - `<MORE_DETAILED_CAPTION>` - Deskripsi detail
+  - `<CAPTION>` - Caption singkat
+  - `<OCR>` - Membaca teks
+
+#### 3. 🎭 Mode Handler
+
+Setiap mode memiliki handler khusus dengan logika pemrosesan cerdas:
+
+| Mode | Handler | Prompt | Fungsi Utama |
+|------|---------|--------|--------------|
+| **Scene** | `SceneMode` | `<MORE_DETAILED_CAPTION>` | Deskripsi lingkungan + deteksi bahaya |
+| **Emotion** | `EmotionMode` | `<CAPTION>` | Analisis ekspresi + saran sosial |
+| **Medicine** | `MedicineMode` | `<OCR>` | Ekstraksi dosis + peringatan keamanan |
+| **Currency** | `CurrencyMode` | `<OCR>` | Deteksi Rupiah + warna uang |
+| **Text** | `TextMode` | `<OCR>` | OCR umum + format untuk suara |
+
+#### 4. 📊 Confidence Scoring
+
+Setiap prediksi memiliki skor kepercayaan (0.0 - 1.0):
+
+```python
+# Contoh output
+{
+    "text": "Terdeteksi: Rp 50.000 (warna biru)",
+    "confidence": 0.85,
+    "suggestions": ["Periksa ciri keamanan uang"]
+}
+```
+
+#### 5. 💾 Caching Layer
+
+```
+┌─────────────────────┐
+│   InferenceCache    │ ← LRU Cache (100 entries)
+├─────────────────────┤
+│   TTSCache          │ ← Audio file caching
+├─────────────────────┤
+│   TranslationCache  │ ← @lru_cache(500)
+└─────────────────────┘
+```
+
+### Struktur Modul Baru
+
+```
+src/dara/
+├── core/           # Komponen inti
+│   ├── model.py    # Kelas DARA utama
+│   ├── processor.py # Preprocessing gambar
+│   └── inference.py # Engine inferensi
+├── modes/          # Handler mode
+│   ├── base.py     # Base class + ModeResult
+│   ├── scene.py    # Mode deskripsi scene
+│   ├── emotion.py  # Mode deteksi emosi
+│   ├── medicine.py # Mode baca obat
+│   ├── currency.py # Mode deteksi mata uang
+│   └── text.py     # Mode OCR teks
+├── services/       # Layer service
+│   ├── tts.py      # Text-to-Speech
+│   ├── translation.py # Terjemahan
+│   └── cache.py    # LRU cache
+└── utils/          # Utilitas
+    ├── logging.py  # Sistem logging
+    ├── text.py     # Pemrosesan teks
+    └── image.py    # Utilitas gambar
+```
+
+### Optimasi Performa
+
+| Fitur | Implementasi | Manfaat |
+|-------|-------------|---------|
+| **FP16** | Auto pada GPU | Memori 2x lebih efisien |
+| **Inference Cache** | LRU 100 entries | Skip inferensi berulang |
+| **TTS Cache** | Hash MD5 | Hindari regenerasi audio |
+| **Batch Processing** | `prepare_batch()` | Proses banyak gambar sekaligus |
+
+### Menambah Mode Baru
+
+1. Buat file handler baru di `modes/`
+2. Extend `BaseMode` class
+3. Implementasi method `process()`
+4. Daftarkan di `core/model.py`
+
+```python
+# Contoh: modes/barcode.py
+class BarcodeMode(BaseMode):
+    @property
+    def name(self) -> str:
+        return "barcode"
+    
+    @property
+    def prompt(self) -> str:
+        return "<OCR>"
+    
+    def process(self, raw_output: str, language: str) -> ModeResult:
+        # Logika khusus barcode
+        ...
+```
+
+---
+
+## English
+
+### System Overview
+
+DARA is built on a modular Vision Language Model (VLM) architecture that supports 5 distinct detection modes while maintaining a lightweight footprint and fast performance.
+
+### Architecture Diagram
+
+```mermaid
+graph TD
+    subgraph "Input Layer"
+        A[📷 Image Input] --> B[Image Processor]
+        M[🎯 Mode Selector] --> N[Task Prompt]
+    end
+    
+    subgraph "Core Engine"
+        B --> C[Vision Encoder<br/>Florence-2 ViT]
+        N --> D[Language Model<br/>Causal LM]
+        C --> D
+    end
+    
+    subgraph "Intelligence Layer"
+        D --> E[Text Decoder]
+        E --> F{Mode Handler}
+        F --> G[SceneMode]
+        F --> H[EmotionMode]
+        F --> I[MedicineMode]
+        F --> J[CurrencyMode]
+        F --> K[TextMode]
+    end
+    
+    subgraph "Output Layer"
+        G & H & I & J & K --> L[ModeResult]
+        L --> O[📝 Text Output]
+        L --> P[🔊 TTS Audio]
+        L --> Q[📊 Metadata]
+    end
+```
+
+### Core Components
+
+#### 1. 🖼️ Vision Encoder
+- **Base**: Florence-2 Vision Transformer (ViT)
+- **Input**: RGB images (auto-resized)
+- **Output**: Visual embeddings
+- **Features**: Built-in object detection, OCR capabilities
+
+#### 2. 🧠 Language Model
 - **Architecture**: Causal LM (autoregressive)
 - **Parameters**: 0.23B (base model)
-- **Task-specific prompts**: `<OD>`, `<CAPTION>`, `<OCR>`
+- **Task Prompts**:
+  - `<MORE_DETAILED_CAPTION>` - Detailed description
+  - `<CAPTION>` - Brief caption
+  - `<OCR>` - Text reading
 
-### 3. Mode Router
+#### 3. 🎭 Mode Handlers
 
-```python
-PROMPTS = {
-    "scene": "<CAPTION>",      # Detailed description
-    "emotion": "<CAPTION>",     # Facial analysis
-    "medicine": "<OCR>",        # Label reading
-    "currency": "<CAPTION>",    # Money identification
-    "text": "<OCR>"             # General text reading
-}
-```
+Each mode has a dedicated handler with intelligent processing logic:
 
-### 4. Smart Assist Layer
+| Mode | Handler | Prompt | Main Function |
+|------|---------|--------|---------------|
+| **Scene** | `SceneMode` | `<MORE_DETAILED_CAPTION>` | Environment description + hazard detection |
+| **Emotion** | `EmotionMode` | `<CAPTION>` | Expression analysis + social guidance |
+| **Medicine** | `MedicineMode` | `<OCR>` | Dosage extraction + safety warnings |
+| **Currency** | `CurrencyMode` | `<OCR>` | Rupiah detection + note colors |
+| **Text** | `TextMode` | `<OCR>` | General OCR + speech formatting |
 
-Post-processing logic that transforms raw model output into actionable advice:
+#### 4. 📊 Confidence Scoring
 
-```python
-def _process_output(raw_text, mode):
-    if mode == "emotion":
-        # Keyword matching → emotion detection
-        if "smile" in raw_text:
-            return "Happy. They seem approachable."
-    
-    elif mode == "medicine":
-        # Mock DB lookup for dosage info
-        return f"{raw_text}. Standard dose: 500mg after food."
-    
-    # ... other modes
-```
-
-## Training Pipeline
-
-### Fine-tuning Strategy
-
-```
-Pre-trained Florence-2
-        ↓
-   LoRA Adapters (r=16, α=32)
-        ↓
-   Multi-task Dataset
-   ├── Scene (COCO)
-   ├── Emotion (FER2013)
-   ├── Medicine (Custom)
-   ├── Currency (Custom)
-   └── Text (OCR datasets)
-        ↓
-   Fine-tuned DARA
-```
-
-### LoRA Configuration
+Every prediction includes a confidence score (0.0 - 1.0):
 
 ```python
-LoraConfig(
-    r=16,                      # Low-rank dimension
-    lora_alpha=32,             # Scaling factor
-    target_modules=["q_proj", "v_proj"],
-    lora_dropout=0.05,
-    bias="none",
-    task_type="CAUSAL_LM"
-)
-```
-
-## Inference Flow
-
-1. **Image preprocessing**: Resize → Normalize
-2. **Prompt injection**: Mode-specific task prompt
-3. **Model forward pass**: Vision + Language encoding
-4. **Beam search decoding**: Generate text (num_beams=3)
-5. **Post-processing**: Smart assist logic
-6. **TTS generation**: Text → Audio
-
-## Performance Optimization
-
-### Current
-- **Device**: CPU/GPU auto-detection
-- **Precision**: FP16 (GPU) / FP32 (CPU)
-- **Latency**: ~200-500ms (CPU, unoptimized)
-
-### Planned
-- **Quantization**: INT8 via ONNX Runtime
-- **Model pruning**: Remove unused layers
-- **Target latency**: <100ms (mobile)
-
-## Data Format
-
-### Training Data Structure
-
-```json
+# Example output
 {
-  "image": "path/to/image.jpg",
-  "mode": "scene",
-  "text": "A kitchen with modern appliances and a dining table."
+    "text": "Detected: Rp 50,000 (blue color)",
+    "confidence": 0.85,
+    "suggestions": ["Verify security features"]
 }
 ```
 
-### Inference Output
+#### 5. 💾 Caching Layer
 
-```python
-{
-  "mode": "scene",
-  "result": "Scene Description: Kitchen with table. Stove is on.",
-  "audio": "output.mp3"
-}
+```
+┌─────────────────────┐
+│   InferenceCache    │ ← LRU Cache (100 entries)
+├─────────────────────┤
+│   TTSCache          │ ← Audio file caching
+├─────────────────────┤
+│   TranslationCache  │ ← @lru_cache(500)
+└─────────────────────┘
 ```
 
-## Extensibility
+### New Module Structure
+
+```
+src/dara/
+├── core/           # Core components
+│   ├── model.py    # Main DARA class
+│   ├── processor.py # Image preprocessing
+│   └── inference.py # Inference engine
+├── modes/          # Mode handlers
+│   ├── base.py     # Base class + ModeResult
+│   ├── scene.py    # Scene description mode
+│   ├── emotion.py  # Emotion detection mode
+│   ├── medicine.py # Medicine reading mode
+│   ├── currency.py # Currency detection mode
+│   └── text.py     # OCR text mode
+├── services/       # Service layer
+│   ├── tts.py      # Text-to-Speech
+│   ├── translation.py # Translation
+│   └── cache.py    # LRU cache
+└── utils/          # Utilities
+    ├── logging.py  # Logging system
+    ├── text.py     # Text processing
+    └── image.py    # Image utilities
+```
+
+### Performance Optimizations
+
+| Feature | Implementation | Benefit |
+|---------|---------------|---------|
+| **FP16** | Auto on GPU | 2x memory efficiency |
+| **Inference Cache** | LRU 100 entries | Skip repeated inferences |
+| **TTS Cache** | MD5 hash | Avoid audio regeneration |
+| **Batch Processing** | `prepare_batch()` | Process multiple images at once |
 
 ### Adding New Modes
 
-1. Define new mode constant in `config.py`
-2. Add prompt mapping
-3. Implement post-processing logic in `model.py`
-4. Prepare training data
-5. Fine-tune with LoRA
+1. Create new handler file in `modes/`
+2. Extend `BaseMode` class
+3. Implement `process()` method
+4. Register in `core/model.py`
 
-### Model Upgrades
+```python
+# Example: modes/barcode.py
+class BarcodeMode(BaseMode):
+    @property
+    def name(self) -> str:
+        return "barcode"
+    
+    @property
+    def prompt(self) -> str:
+        return "<OCR>"
+    
+    def process(self, raw_output: str, language: str) -> ModeResult:
+        # Barcode-specific logic
+        ...
+```
 
-- **DARA → DARA-Pro**: Swap base model in `config.py`
-- **LoRA → Full fine-tune**: Remove PEFT wrapper
-- **Multi-lingual**: Change TTS language in `gTTS(lang='id')`
+---
 
-## Security Considerations
+## Pertimbangan Keamanan | Security Considerations
 
-- **Input validation**: Image size limits, format checks
-- **Safe inference**: No code execution from model outputs
-- **Privacy**: All processing can be done offline (no external API calls)
+| 🇮🇩 Bahasa Indonesia | 🇺🇸 English |
+|---------------------|------------|
+| **Validasi Input**: Batas ukuran gambar, pengecekan format | **Input Validation**: Image size limits, format checks |
+| **Inferensi Aman**: Tidak ada eksekusi kode dari output model | **Safe Inference**: No code execution from model outputs |
+| **Privasi**: Semua pemrosesan bisa dilakukan offline | **Privacy**: All processing can be done offline |

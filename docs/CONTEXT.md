@@ -1,202 +1,241 @@
-# 🪔 DARA — Project Context & Vision
+# 🌟 Konteks & Visi DARA | DARA Context & Vision
 
-> **"Mata untuk semua" (Eyes for everyone)**
-
-## Project Philosophy
-
-DARA was born from a simple question: *What if AI could be the "eyes" for those who need them most?*
-
-This project is not just about building another VLM. It's about creating technology that:
-- **Empowers** visually impaired individuals to navigate the world independently
-- **Runs anywhere** - from high-end servers to 3-year-old smartphones
-- **Speaks the local language** - Indonesian and English support
-- **Remains open** - fully transparent, auditable, and community-owned
-
-## The Problem
-
-Current VLMs face critical limitations for assistive technology:
-1. **Too Large**: Models like GPT-4V require cloud APIs and fast internet
-2. **Too Expensive**: Commercial APIs cost prohibitive for daily use
-3. **Privacy Concerns**: Medical/financial data sent to external servers
-4. **Language Barriers**: Poor support for non-English languages
-5. **Context-Blind**: Generic descriptions without actionable advice
-
-## DARA's Solution
-
-### 1. Lightweight Architecture
-- **DARA-Lite**: 0.23B parameters (Florence-2)
-- **Fits in**: <500MB on disk, <2GB RAM
-- **Runs on**: CPU, mobile SoCs, edge devices
-
-### 2. "Smart Assist" Logic
-Unlike generic VLMs that only describe, DARA provides **actionable guidance**:
-
-```
-❌ Generic VLM: "A bottle with text on it"
-✅ DARA: "Paracetamol 500mg. Standard dose: 1-2 tablets after food. Do not exceed 8 tablets in 24h."
-```
-
-### 3. Multi-Modal Intelligence
-The 5 modes cover daily life scenarios:
-- **Scene**: Spatial awareness (obstacle detection, room layout)
-- **Emotion**: Social interaction support
-- **Medicine**: Health safety and compliance
-- **Currency**: Financial independence
-- **Text**: Information access (signs, menus, labels)
-
-## Technical Innovation
-
-### Task-Specific Prompting
-Instead of one generic model, DARA uses **mode-aware prompting**:
-
-```python
-# Efficient mode switching without model reload
-if mode == "scene":
-    prompt = "<CAPTION>"  # Detailed description
-elif mode == "text":
-    prompt = "<OCR>"      # Precise text extraction
-```
-
-### LoRA Fine-Tuning
-- Train only **0.1%** of parameters
-- **10x faster** than full fine-tuning
-- **1/10th memory** requirement
-
-### Offline-First Design
-- No internet required after download
-- All processing on-device
-- Privacy-preserving by default
-
-## Roadmap
-
-### Phase 1: Foundation (✅ Complete)
-- [x] Core architecture with Florence-2
-- [x] 5-mode implementation
-- [x] Gradio web demo
-- [x] Basic TTS integration
-
-### Phase 2: Intelligence (🔄 In Progress)
-- [ ] Collect domain-specific datasets
-- [ ] Fine-tune on medicine labels (Indonesia)
-- [ ] Train emotion recognition model
-- [ ] Build currency classifier (IDR, USD, EUR)
-
-### Phase 3: Optimization (📋 Planned)
-- [ ] ONNX export for mobile
-- [ ] INT8 quantization (<100ms latency)
-- [ ] Android/iOS app wrappers
-- [ ] Offline voice packs (Indonesian)
-
-### Phase 4: Community (🎯 Future)
-- [ ] Hugging Face release
-- [ ] Public dataset contributions
-- [ ] User studies with visually impaired community
-- [ ] Multi-language expansion (Javanese, Sundanese, etc.)
-
-## Impact Goals
-
-### Accessibility Metrics
-- **Target Users**: 250M+ visually impaired people worldwide
-- **Device Reach**: Works on $100 smartphones
-- **Latency**: <100ms for real-time assistance
-- **Offline**: 100% functionality without internet
-
-### Open Source Commitment
-- **License**: Apache 2.0 / MIT
-- **Transparency**: All training data documented
-- **Community**: Issue tracker, discussions, contributions welcome
-- **Education**: Tutorials for assistive tech developers
-
-## Design Principles
-
-### 1. Speed Over Perfection
-Better to have 85% accuracy in 50ms than 95% in 2 seconds.
-**Why**: Real-time feedback is critical for safety.
-
-### 2. Actionable Over Descriptive
-Don't just say "red pill", say "This is ibuprofen, reduce pain and fever."
-**Why**: Users need guidance, not just information.
-
-### 3. Local Over Cloud
-Process on-device whenever possible.
-**Why**: Privacy, reliability, cost.
-
-### 4. Inclusive Design
-Support Bahasa Indonesia as a first-class citizen.
-**Why**: 270M+ speakers deserve accessible AI.
-
-## User Stories
-
-### Story 1: Medicina Safety
-*Siti, 65, diabetic, visually impaired*
-> "I use DARA to scan my medicine bottles every morning. It tells me which is insulin and which is metformin. It even reminds me to take them with food."
-
-### Story 2: Currency Independence
-*Budi, 40, entrepreneur*
-> "When customers pay cash, I use DARA's currency mode to verify bills. It's faster than asking my assistant."
-
-### Story 3: Social Confidence
-*Rina, 28, office worker*
-> "DARA's emotion mode helps me 'read the room' in meetings. It gives me confidence to speak up."
-
-## Why Florence-2?
-
-We chose Microsoft's Florence-2 as DARA-Lite's base for specific reasons:
-
-1. **Native Multi-Task**: Built-in OCR, captioning, object detection
-2. **Tiny Size**: 0.23B vs 7B+ for competitors
-3. **Public Weights**: Fully open-sourced
-4. **Proven Performance**: SOTA on lightweight VLM benchmarks
-5. **Fine-Tunable**: LoRA support, efficient training
-
-## Challenges & Limitations
-
-### Current Limitations
-- **Smart Assist**: Mostly rule-based (limited medical database)
-- **Emotion Detection**: Relies on caption keywords, not trained classifier
-- **Multi-Language**: TTS supports Indonesian, but model is English-dominant
-- **Edge Cases**: Struggles with low-light, blurry images
-
-### Active Research
-- [ ] Vision-only emotion classifier (no text needed)
-- [ ] Integrate with Indonesian medical drug database
-- [ ] Low-light image enhancement pre-processor
-- [ ] Multilingual training (Indonesian captions)
-
-## Get Involved
-
-### For Developers
-- Contribute code improvements
-- Add new modes (e.g., "Food" mode for nutrition)
-- Optimize inference speed
-
-### For Data Scientists
-- Curate Indonesian-language datasets
-- Improve Smart Assist logic
-- Benchmark on edge devices
-
-### For Accessibility Experts
-- User testing with visually impaired community
-- UX/UI feedback on voice prompts
-- Feature requests for real-world needs
-
-### For Donors/Sponsors
-- Fund dataset annotation (medicine labels)
-- Support app store deployment
-- Sponsor cloud hosting for web demo
-
-## Long-Term Vision
-
-**DARA 2030**: Every smartphone ships with an on-device assistive AI.
-- Universally accessible
-- Privacy-preserving
-- Culturally aware
-- Community-owned
+[🇮🇩 Bahasa Indonesia](#bahasa-indonesia) | [🇺🇸 English](#english)
 
 ---
 
-**Join us in building eyes for everyone. 🪔**
+## Bahasa Indonesia
 
-GitHub: [github.com/yourusername/dara]
-Hugging Face: [huggingface.co/DARA]
-Email: dara.project@example.com
+### Misi Kami
+
+> **"Mata untuk semua"**
+
+DARA lahir dari keyakinan bahwa teknologi AI harus dapat diakses oleh semua orang, terlepas dari kemampuan fisik atau kondisi ekonomi mereka.
+
+### Masalah yang Kami Selesaikan
+
+#### 1. Aksesibilitas Terbatas
+
+Di Indonesia, ~3.7 juta orang mengalami gangguan penglihatan. Banyak dari mereka:
+- Tidak mampu membeli perangkat asistif mahal
+- Tinggal di daerah dengan koneksi internet terbatas
+- Membutuhkan bantuan dalam bahasa daerah/Indonesia
+
+#### 2. Teknologi yang Tidak Ramah
+
+Solusi AI yang ada sering:
+- Memerlukan koneksi internet stabil
+- Tidak mendukung Bahasa Indonesia
+- Terlalu kompleks untuk pengguna awam
+- Tidak mempertimbangkan kebutuhan lokal (mata uang Rupiah, dll)
+
+### Solusi DARA
+
+| Tantangan | Solusi DARA |
+|-----------|-------------|
+| Butuh internet | ✅ Bekerja offline sepenuhnya |
+| Harga mahal | ✅ Open source, gratis |
+| Tidak berbahasa Indonesia | ✅ Dukungan bilingual (ID/EN) |
+| Kompleks | ✅ Antarmuka sederhana |
+| Tidak relevan lokal | ✅ Fokus Rupiah Indonesia |
+
+### 5 Mode Cerdas
+
+1. **🏞️ Scene** - Mendeskripsikan lingkungan sekitar
+   - Deteksi bahaya (tangga, api, dll)
+   - Petunjuk navigasi
+
+2. **😊 Emotion** - Membaca ekspresi wajah
+   - Deteksi emosi dasar
+   - Saran interaksi sosial
+
+3. **💊 Medicine** - Membaca label obat
+   - Ekstraksi dosis
+   - Peringatan keamanan
+
+4. **💵 Currency** - Identifikasi mata uang
+   - 8 denominasi Rupiah
+   - Warna dan ciri-ciri uang
+
+5. **📝 Text** - Membaca teks apapun
+   - Tanda, dokumen, dll
+   - Format untuk suara
+
+### Target Pengguna
+
+- 👨‍🦯 Tunanetra dan low vision
+- 👴 Lansia dengan gangguan penglihatan
+- 🏥 Pasien yang kesulitan membaca label obat
+- 💼 Pedagang yang perlu verifikasi uang
+
+### Roadmap
+
+#### Fase 1: Foundation ✅
+- [x] Model dasar dengan Florence-2
+- [x] 5 mode deteksi
+- [x] Dukungan bilingual
+- [x] Text-to-Speech
+
+#### Fase 2: Optimization 🔄
+- [x] Arsitektur modular
+- [x] Inference caching
+- [ ] Quantization (INT8)
+- [ ] ONNX export
+
+#### Fase 3: Deployment 🔜
+- [ ] Aplikasi Android
+- [ ] Integrasi WhatsApp Bot
+- [ ] Hugging Face Spaces
+- [ ] API publik
+
+#### Fase 4: Expansion 📋
+- [ ] Mode barcode/QR
+- [ ] Deteksi bahaya real-time
+- [ ] Lebih banyak bahasa daerah
+- [ ] Kolaborasi dengan organisasi tunanetra
+
+---
+
+## English
+
+### Our Mission
+
+> **"Eyes for everyone"**
+
+DARA was born from the belief that AI technology should be accessible to everyone, regardless of their physical abilities or economic conditions.
+
+### Problems We Solve
+
+#### 1. Limited Accessibility
+
+In Indonesia, ~3.7 million people are visually impaired. Many of them:
+- Cannot afford expensive assistive devices
+- Live in areas with limited internet connectivity
+- Need assistance in local languages/Indonesian
+
+#### 2. Unfriendly Technology
+
+Existing AI solutions often:
+- Require stable internet connections
+- Don't support Indonesian language
+- Are too complex for regular users
+- Don't consider local needs (Rupiah currency, etc.)
+
+### DARA's Solution
+
+| Challenge | DARA's Answer |
+|-----------|---------------|
+| Needs internet | ✅ Works fully offline |
+| Expensive | ✅ Open source, free |
+| No Indonesian | ✅ Bilingual support (ID/EN) |
+| Complex | ✅ Simple interface |
+| Not locally relevant | ✅ Indonesian Rupiah focus |
+
+### 5 Smart Modes
+
+1. **🏞️ Scene** - Describes surrounding environment
+   - Hazard detection (stairs, fire, etc.)
+   - Navigation hints
+
+2. **😊 Emotion** - Reads facial expressions
+   - Basic emotion detection
+   - Social interaction advice
+
+3. **💊 Medicine** - Reads medicine labels
+   - Dosage extraction
+   - Safety warnings
+
+4. **💵 Currency** - Currency identification
+   - 8 Rupiah denominations
+   - Colors and note features
+
+5. **📝 Text** - Reads any text
+   - Signs, documents, etc.
+   - Formatted for speech
+
+### Target Users
+
+- 👨‍🦯 Blind and low vision individuals
+- 👴 Elderly with vision impairment
+- 🏥 Patients who struggle to read medicine labels
+- 💼 Merchants who need to verify money
+
+### Roadmap
+
+#### Phase 1: Foundation ✅
+- [x] Base model with Florence-2
+- [x] 5 detection modes
+- [x] Bilingual support
+- [x] Text-to-Speech
+
+#### Phase 2: Optimization 🔄
+- [x] Modular architecture
+- [x] Inference caching
+- [ ] Quantization (INT8)
+- [ ] ONNX export
+
+#### Phase 3: Deployment 🔜
+- [ ] Android application
+- [ ] WhatsApp Bot integration
+- [ ] Hugging Face Spaces
+- [ ] Public API
+
+#### Phase 4: Expansion 📋
+- [ ] Barcode/QR mode
+- [ ] Real-time hazard detection
+- [ ] More regional languages
+- [ ] Collaboration with blind organizations
+
+---
+
+## 💡 Filosofi Desain | Design Philosophy
+
+### 1. Accessibility First
+Setiap keputusan desain mempertimbangkan aksesibilitas. Output dioptimalkan untuk TTS dan mudah dipahami.
+
+Every design decision considers accessibility. Output is optimized for TTS and easy to understand.
+
+### 2. Offline by Default
+DARA berjalan sepenuhnya offline. Tidak ada data yang dikirim ke server eksternal.
+
+DARA runs fully offline. No data is sent to external servers.
+
+### 3. Local Context
+Fokus pada kebutuhan pengguna Indonesia: Rupiah, Bahasa Indonesia, konteks lokal.
+
+Focus on Indonesian user needs: Rupiah, Indonesian language, local context.
+
+### 4. Open & Transparent
+Kode sumber terbuka, model dapat diinspeksi, tanpa "black box".
+
+Open source code, inspectable model, no "black box".
+
+---
+
+## 🤝 Kontribusi | Contributing
+
+Kami menyambut kontribusi! Lihat [CONTRIBUTING.md](../CONTRIBUTING.md) untuk panduan.
+
+We welcome contributions! See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
+
+### Cara Berkontribusi
+
+1. **Kode**: Bug fixes, fitur baru
+2. **Data**: Dataset training untuk mode baru
+3. **Dokumentasi**: Terjemahan, tutorial
+4. **Testing**: Pengujian aksesibilitas
+5. **Feedback**: Masukan dari pengguna tunanetra
+
+---
+
+## 📞 Kontak | Contact
+
+- **GitHub Issues**: Laporan bug dan fitur request
+- **Discussions**: Pertanyaan umum dan ide
+- **Email**: [Belum tersedia]
+
+---
+
+*Dibangun dengan ❤️ untuk aksesibilitas*
+
+*Built with ❤️ for accessibility*
